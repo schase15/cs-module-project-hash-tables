@@ -21,7 +21,15 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        # Your code here
+
+        # Hashtables have a minimum size
+        if capacity >= MIN_CAPACITY:
+            self.capacity = capacity
+        else:
+            self.capacity = MIN_CAPACITY
+
+        # Create array of size capacity populated with None
+        self.data = [None] * self.capacity
 
 
     def get_num_slots(self):
@@ -34,7 +42,9 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+
+        # Return capacity
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -62,7 +72,14 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash = 5381
+
+        for c in key:
+            # ord() function returns an integer representing the Unicode character
+            # adding the result of ord to 33*5381 - for each character in the key
+            hash = (hash * 33) + ord(c)
+
+        return hash
 
 
     def hash_index(self, key):
@@ -81,8 +98,13 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
 
+        # Use the hash_index() method to get the proper index
+        index = self.hash_index(key)
+
+        # Store the given value in the slot at that index
+            # Store it in a linked list node using HashTableEntry class
+        self.data[index] = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -92,8 +114,15 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # Find the index of the given key
+        index = self.hash_index(key)
 
+        # If there is somthing in that slot, delete it 
+        if self.data[index] != None:
+            self.data[index] = None
+
+        if self.data[index] == None:
+            print('Key is not found')
 
     def get(self, key):
         """
@@ -103,8 +132,18 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # Get the index location
+        index = self.hash_index(key)
 
+        # Return the node at that index location
+        node = self.data[index]
+
+        # If there is a node there, return the value associated with it
+        if node != None:
+            return node.value
+        
+        if node == None:
+            return None
 
     def resize(self, new_capacity):
         """
