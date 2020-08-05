@@ -20,7 +20,7 @@ class LinkedList():
     def find(self, key):
         cur = self.head
 
-        # While there is still set
+        # While we are still inside the linked list
         while cur is not None:
             # If the value is found, return it
             if cur.key == key:
@@ -39,8 +39,7 @@ class LinkedList():
         # Set the new node as the head
         self.head = node
 
-# Delete nodes by removing any next link pointers to them
-
+    # Delete nodes by removing any next link pointers to them
     def delete(self, key):
         cur = self.head
 
@@ -60,10 +59,10 @@ class LinkedList():
             if cur.key == key:
                 # Cut out the node, set the previous next to the cur.next
                 prev.next = cur.next
-                # Return deleted key for the user
+                # Return deleted node for the user
                 return cur
             else:
-                # Bump prev and cur pointers up one, until cur falls off the end of the list
+                # Move prev and cur pointers up one, until cur falls off the end of the list
                 prev = cur
                 cur = cur.next
 
