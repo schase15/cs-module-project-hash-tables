@@ -1,11 +1,13 @@
 # Already did this with the histo.py example
 
-# Only works on 3 out of 5 test
-    # I think the test is wrong, In the second one, "Hello   hello", there are no special characters
-    # so it should return a blank dictionary, not 'hello' : 2
+# Only works on 3 out of 5 test with the special characters if statement
+    # I think the test is wrong, based on the Readme. It says if no special characters are 
+    # removed it should return a blank dictionary.
+        # In the second one, "Hello   hello", there are no special characters
+        # so it should return a blank dictionary, not 'hello' : 2
 
-    # For the last test, python already ignores \'s and the following letter so it 
-    # Returns no special characters removed
+        # For the last test, python already ignores \'s and the following letter so it 
+        # Returns no special characters removed
 
 
 def word_count(s):
@@ -18,9 +20,7 @@ def word_count(s):
     '''
 
     charac_ignore = ' " : ; , . - + = / \ | [ ] } { ( ) * ^ &  '.split(' ')
-
-    print(charac_ignore)
-
+    
     ## Clean the punctuation out
     # Blank string to filter cleaned text into
     empty_string = ""
@@ -48,9 +48,9 @@ def word_count(s):
     d = {}  
 
     # If no special characaters are removed, return empty dictionary
-    if removed == 0:
-        print('No special characters removed')
-        return d
+    # if removed == 0:
+    #     print('No special characters removed')
+    #     return d
 
     # Split the string into a list of individual words - split on whitespace
     arr = empty_string.split()
