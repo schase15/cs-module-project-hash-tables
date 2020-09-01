@@ -1,12 +1,85 @@
+# HashTableEntry() class creates a node to store key and value in a linked list
+# LinkedList() class creates an empty linked list to store HashTableEntry nodes
+# HashTable() class creates an empty array to hold linked lists
+
+
+class LinkedList():
+    '''
+    Linked list class that will hold HashtableEntry nodes
+    Methods:
+    - Find(): Looks through linked list to see if given key exists
+    - Insert_at_head(): Inserts a HashTableEntry node with key and value at the head of the linked list
+    - Delete(): If the given key exists, deletes the node associated with the key
+    '''
+
+    def __init__(self):
+        # Add a head indicator to know where to start
+        self.head = None
+
+    # Search through the linked list to see if the key exists
+    def find(self, key):
+        cur = self.head
+
+        # While we are still inside the linked list
+        while cur is not None:
+            # If the value is found, return it
+            if cur.key == key:
+                return cur
+
+            cur = cur.next
+
+        # We we walk through until there is no more next node and haven't 
+        # found the value we are looking for, return None
+        return None    
+
+    # Insert a new node at the head of the list
+    def insert_at_head(self, node):
+        # Move the current head to the next of the new node
+        node.next = self.head
+        # Set the new node as the head
+        self.head = node
+
+    # Delete nodes by removing any next link pointers to them
+    def delete(self, key):
+        cur = self.head
+
+        # Special case of deleting the head of the list
+        if cur.key == key:
+            # Move the head to the next node
+            self.head = cur.next
+            # Return deleted node
+            return cur
+        
+        # General case of deleting from the rest of the list
+        prev = cur
+        cur = cur.next
+
+        # Look at the current node.key
+        while cur is not None:
+            if cur.key == key:
+                # Cut out the node, set the previous next to the cur.next
+                prev.next = cur.next
+                # Return deleted node for the user
+                return cur
+            else:
+                # Move prev and cur pointers up one, until cur falls off the end of the list
+                prev = cur
+                cur = cur.next
+
+        # If we get here, we didn't find it
+        return None
+
 class HashTableEntry:
     """
-    Linked List hash table key/value pair
+    Creates node inside of a linked list to store key and value
     """
     def __init__(self, key, value):
         self.key = key
         self.value = value
         self.next = None
 
+    def __repr__(self):
+        return f'Node({repr(self.value)})'
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -21,7 +94,21 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        # Your code here
+
+        # Hashtables have a minimum size
+        if capacity >= MIN_CAPACITY:
+            self.capacity = capacity
+        else:
+            self.capacity = MIN_CAPACITY
+
+        # Create array of size capacity populated with None
+        self.data = [None] * self.capacity
+
+        # Counter to be used by load factor
+        self.count = 0
+
+        # Add a head indicator
+        self.head = None
 
 
     def get_num_slots(self):
@@ -34,7 +121,9 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+
+        # Return capacity
+        return self.capacity
 
 
     def get_load_factor(self):
@@ -43,7 +132,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # Number of items in hash table / number of slots
+        return self.count / self.capacity
 
 
     def fnv1(self, key):
@@ -62,7 +152,14 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash = 5381
+
+        for c in key:
+            # ord() function returns an integer representing the Unicode character
+            # adding the result of ord to 33*5381 - for each character in the key
+            hash = (hash * 33) + ord(c)
+
+        return hash
 
 
     def hash_index(self, key):
@@ -71,7 +168,10 @@ class HashTable:
         between within the storage capacity of the hash table.
         """
         #return self.fnv1(key) % self.capacity
+            # Divides hash of key by the capacity, 
+            # returns the remainder to be used as the index location
         return self.djb2(key) % self.capacity
+
 
     def put(self, key, value):
         """
@@ -81,7 +181,47 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+
+        # Use the hash_index() method to get the proper index
+        index = self.hash_index(key)
+
+        # If the slot is empty - None, Start a new linked list
+        # and add a node with the key and value
+        if self.data[index] == None:
+            # Start new linked list
+            self.data[index] = LinkedList()
+            # Add in new node with key and value
+            self.data[index].insert_at_head(HashTableEntry(key, value))
+            # Add 1 to count whenever a node is added
+            self.count += 1
+        
+        # If that slot isn't empty
+        else:
+            # Linked list at the specific index
+            linked_list = self.data[index]
+
+            # Search the linked list for the key
+                # If it finds it, it will return the node that holds the key and value
+                # If it doesn't find it, it will return None
+            find_key = linked_list.find(key)
+
+            # If the key doesn't exists, add a new node with the key and value
+            if find_key == None:
+                # Add node
+                linked_list.insert_at_head(HashTableEntry(key, value))
+                # Add 1 to count
+                self.count += 1
+
+            # if the key exists, overwrite the value
+            else:
+                find_key.value = value
+
+        # Check the load factor, if it is more than 0.7 
+            # Double table and re-hash
+        if self.get_load_factor() > 0.7:
+            # Run re-size function
+            self.resize(self.capacity *2)
+            # pass
 
 
     def delete(self, key):
@@ -92,7 +232,33 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # Find the index of the given key
+        index = self.hash_index(key)
+
+        # If there is nothing at that index, return Error Message
+        if self.data[index] == None:
+            print('Key is not found')
+
+        # If there is something at that index,
+        else:
+        # Use the linked list delete method
+            # If it finds the key, it will delete it and return the node deleted
+            # If it doesn't find the key, it will return None
+
+            linked_list = self.data[index]
+            result = linked_list.delete(key)
+
+            # If the result of delete is None,
+                # Print "key not found" for the user
+            if result == None:
+                print('Key not found')
+            # If the key is found and deleted
+                # Return the deleted value
+                # Subtract 1 from the count
+            else:
+                self.count -= 1
+                # Print the deleted key for the user's reference
+                print(f"Key deleted: {result.key}.")
 
 
     def get(self, key):
@@ -103,8 +269,27 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # Get the index location
+        index = self.hash_index(key)
 
+        # If there is nothing at that index, return None
+        if self.data[index] == None:
+            return None
+        
+        # Otherwise, examine the linked list at that index
+        else:
+            linked_list = self.data[index]
+            # Use the find method to find the node at with the key
+            #  Returns a Node with the key
+            #  Or returns None if the key doesn't exist
+            key_node = linked_list.find(key)
+
+            # If key doesn't exits, return None
+            if key_node == None:
+                return None
+            # If the key exists, return the value associated
+            else:
+                return key_node.value
 
     def resize(self, new_capacity):
         """
@@ -113,8 +298,40 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # Save the data from the old ht
+        old_ht = self.data
 
+        # Change the capacity to the new capacity
+        self.capacity = new_capacity
+
+        # Write over any data with None
+        self.data = [None] * self.capacity
+
+        # Re-set the count to 0
+        self.count = 0
+
+        # Re-set the head
+        self.head = None
+
+        # Use the data stored from the old Hashtable to re-hash and populate 
+        # into the re-set, doubled capacity array
+
+        # Iterate through each array of linked lists
+        # Skip over indexes that don't have a linked list
+        for linked_list in old_ht:
+            # If linked_list is None
+            if linked_list == None:
+                pass
+            else:
+                # For each linked list, traverse each node
+                cur = linked_list.head
+
+                # While there is still a current node
+                while cur is not None:
+                    # Perform PUT with key and value
+                    self.put(cur.key, cur.value)
+                    # Move to the next node and repeat
+                    cur = cur.next
 
 
 if __name__ == "__main__":

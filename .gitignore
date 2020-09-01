@@ -1,2 +1,4 @@
 __pycache__
 .vscode
+# Ignore the script page
+.script

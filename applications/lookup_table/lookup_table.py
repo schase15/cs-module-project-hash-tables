@@ -1,5 +1,7 @@
-# Your code here
+# Imports 
 
+import math
+import random
 
 def slowfun_too_slow(x, y):
     v = math.pow(x, y)
@@ -9,14 +11,23 @@ def slowfun_too_slow(x, y):
 
     return v
 
+# Create a cache to store the calculations we already did for easy lookup
+    # Store the x and y as a tuple key
+    # The solution as the value
+cache = {}
+
 def slowfun(x, y):
     """
     Rewrite slowfun_too_slow() in here so that the program produces the same
     output, but completes quickly instead of taking ages to run.
     """
-    # Your code here
-
-
+    # Check to see if the answer is in the cache
+        # If it isn't calculate and store it 
+    if (x,y) not in cache.keys():
+        cache[(x,y)] = slowfun_too_slow(x,y)
+    
+    return cache[(x,y)]
+    
 
 # Do not modify below this line!
 
